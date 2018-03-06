@@ -11,12 +11,14 @@ const async = require('async');
 
 async.series({
     requestOne: callback => {
-        let body = '';
+        let body = {
+            user_id: 1
+        };
         http.get(process.argv[2], res => {
             res.on('error', err => callback(err));
             res.on('data', data => body += data);
             res.on('end', () => callback(null, body));
-        })
+        });
     },
     requestTwo: callback => {
         let body = '';
@@ -24,8 +26,8 @@ async.series({
             res.on('error', err => callback(err));
             res.on('data', data => body += data);
             res.on('end', () => callback(null, body));
-        })
+        });
     }
 }, (err, results) => {
     console.log(results);
-})
+});
