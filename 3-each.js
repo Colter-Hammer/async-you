@@ -9,7 +9,7 @@ const http = require('http');
 async.each([process.argv[2], process.argv[3]], (item, done) => {
     http.get(item, res => {
         res.on('error', err => done(err));
-    })
-}, (err, results) => {
+    });
+}, (err) => {
     if (err) console.log(err);
-})
+});

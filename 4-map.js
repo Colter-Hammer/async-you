@@ -10,13 +10,14 @@ const http = require('http');
 async.map([process.argv[2], process.argv[3]], (items, done) => {
     let body = '';
     http.get(items, res => {
-        res.on('error', () => done(err));
+        res.on('error', () => done(err)
+        );
         res.on('data', data => {
-            body += data
+            body += data;
         });
         res.on('end', () => done(null, body));
-    })
+    });
 }, (err, results) => {
     if (err) console.log(err);
     console.log(results);
-})
+});

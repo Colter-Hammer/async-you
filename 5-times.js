@@ -14,46 +14,57 @@
 const async = require('async');
 const http = require('http');
 
-// // adds a user incrementing the id by one every time.
-// let addUser = (id, callback) => {
-//     callback(null, { user_id: id + 1 });
-// }
+function makeRequest(options, postData, callback) {
+    postData = JSON.stringify(postData);
+    const req = http.request(options, (res) => {
+        var body = '';
+        res.setEncoding('utf8');
+        res.on('data', (chunk) => {
+            body += chunk;
+        });
+        res.on('end', () => {
+            callback(null, body);
+        });
+    });
 
-// // async.times to do the addUser function several times.
-// let times = async.times(5, (n, done) => {
-//     addUser(n, (err, user) => done(err, user));
-// }, (err, users) => {
-//     if (err) console.log(err);
-//     console.log(JSON.stringify(users));
-// })
+    req.on('error', (e) => {
+        callback(e);
+    });
 
-let options = {
-    hostname: process.argv[2],
-    port: process.argv[3],
-    path: '/users/create',
-    method: 'POST'
+    // write data to request body
+    req.write(postData);
+    req.end();
 }
 
-let url = process.argv[2];
-const req = http.request(url + '/users/create/', (res) => {
-    console.log(`STATUS: ${res.statusCode}`);
-    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-    res.setEncoding('utf8');
-    res.on('data', (chunk) => {
-        console.log(`BODY: ${chunk}`);
-    });
-    res.on('end', () => {
-        console.log('No more data in response.');
-    });
-});
 
-req.on('error', (e) => {
-    console.error(`problem with request: ${e.message}`);
-});
+async.series({
+    post: seriesCallback => {
 
-const postData = JSON.stringify({
-    'msg': 'Hello World!'
+        // times
+        let options = {
+            hostname: process.argv[2],
+            port: process.argv[3],
+            path: '/users/create',
+            method: 'POST'
+        };
+
+        const postData = {
+            'msg': 'Hello World!'
+        };
+
+        makeRequest(options, postData, seriesCallback);
+
+
+
+
+    },
+    get: callback => {
+        let options = {
+            hostname: process.argv[2],
+            port: process.argv[3],
+            path: '/users',
+            method: 'GET'
+        };
+        makeRequest(options, null, callback);
+    }
 });
-// write data to request body
-req.write(postData);
-req.end()
