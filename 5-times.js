@@ -10,6 +10,7 @@
  * `url + '/users'`
  * console.log response from the GET request. 
  */
+
 // Necessary modules for the request, and async functions
 const async = require('async');
 const http = require('http');
@@ -22,17 +23,25 @@ function makeRequest(options, postData, callback) {
         res.on('data', (chunk) => {
             body += chunk;
         });
+
+    // Not writing anything to body
+    console.log(body);
+
         res.on('end', () => {
             callback(null, body);
         });
     });
 
+    // Only runs if there are errors in the request
     req.on('error', (e) => {
         callback(e);
     });
 
     // write data to request body
     req.write(postData);
+    // console.log(req.write(postData));
+    // console.log(postData);
+
     req.end();
 }
 
@@ -48,23 +57,29 @@ async.series({
             method: 'POST'
         };
 
-        const postData = {
-            'msg': 'Hello World!'
+        async.times(5, (n, seriesCallback) => {
+        let postData = {
+            'user_id': n + 1
         };
+        // console.log(postData);
 
         makeRequest(options, postData, seriesCallback);
-
-
-
-
-    },
-    get: callback => {
+    })
+}
+,
+    get: (err, res) => {
         let options = {
             hostname: process.argv[2],
             port: process.argv[3],
             path: '/users',
             method: 'GET'
         };
-        makeRequest(options, null, callback);
+        let body = '';
+        res.on('data', data => body += data);
+        callback(null, body);
+        // makeRequest(options, null, callback);
     }
+},  (err,result) => {
+        if (err) console.log(err);
+        console.log(result)
 });
