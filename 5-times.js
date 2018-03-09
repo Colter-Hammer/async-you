@@ -10,61 +10,63 @@
  * `url + '/users'`
  * console.log response from the GET request. 
  */
+
 // Necessary modules for the request, and async functions
 const async = require('async');
 const http = require('http');
 
-function makeRequest(options, postData, callback) {
-    postData = JSON.stringify(postData);
-    const req = http.request(options, (res) => {
+function makePost(options, postData, cb) {
+    const req = http.request(options, res => {
         var body = '';
         res.setEncoding('utf8');
-        res.on('data', (chunk) => {
-            body += chunk;
-        });
-        res.on('end', () => {
-            callback(null, body);
-        });
-    });
+        res.on('data', data => body += data);
+        res.on('end', () => cb(null, body));
+        res.on('error', cb);
+    })
 
-    req.on('error', (e) => {
-        callback(e);
-    });
-
-    // write data to request body
-    req.write(postData);
+    req.on('error', cb);
+    req.write(JSON.stringify(postData));
     req.end();
 }
 
+function postReq(postCB) {
+    // Set the options for the POST
+    let options = {
+        hostname: process.argv[2],
+        port: process.argv[3],
+        path: '/users/create',
+        method: 'POST'
+    }
+
+    async.times(5, (n, done) => {
+        let postData = { 'user_id': n + 1 };
+        makePost(options, postData, done);
+    }, postCB)
+}
+
+function getReq(getCB) {
+    // sets options for GET
+    let options = {
+        hostname: process.argv[2],
+        port: process.argv[3],
+        path: '/users',
+        // method: 'GET'
+    };
+
+    // Creates GET request
+    http.get(options, res => {
+        let body = '';
+        res.setEncoding('utf8');
+        res.on('error', error => getCB(error));
+        res.on('data', data => body += data);
+        res.on('end', () => getCB(null, body));
+    })
+}
 
 async.series({
-    post: seriesCallback => {
-
-        // times
-        let options = {
-            hostname: process.argv[2],
-            port: process.argv[3],
-            path: '/users/create',
-            method: 'POST'
-        };
-
-        const postData = {
-            'msg': 'Hello World!'
-        };
-
-        makeRequest(options, postData, seriesCallback);
-
-
-
-
-    },
-    get: callback => {
-        let options = {
-            hostname: process.argv[2],
-            port: process.argv[3],
-            path: '/users',
-            method: 'GET'
-        };
-        makeRequest(options, null, callback);
-    }
-});
+    post: postReq,
+    get: getReq
+}, (err, result) => {
+    if (err) console.log(err);
+    console.log(result.get);
+})
