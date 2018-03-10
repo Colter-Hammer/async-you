@@ -70,3 +70,11 @@ async.series({
     if (err) console.log(err);
     console.log(result.get);
 })
+
+/**
+ * What does async.times do?
+ *      receives as the parameters:
+ *      1. the number of times you want to do something
+ *      2. the function you are going to perform those times
+ *      3. callback
+ */

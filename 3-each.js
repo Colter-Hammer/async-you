@@ -13,3 +13,13 @@ async.each([process.argv[2], process.argv[3]], (item, done) => {
 }, (err) => {
     if (err) console.log(err);
 });
+
+/**
+ * What does async.each do?
+ *       Parameters are:
+ *      1. an array of values
+ *      2. The function that you want to run the different values on.
+ *      3. final callback
+ *          The callback is passed error and ____________Something?
+ *      runs in parallel
+ */

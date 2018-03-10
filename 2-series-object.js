@@ -31,3 +31,9 @@ async.series({
 }, (err, results) => {
     console.log(results);
 });
+
+/**
+ * What does async.series do?
+ *  
+ * ** Series takes as parameters several functions and a final callback. The functions are run one after another and their return values are saved as either an array or an object, depending on how you format the call.  The final callback recieves the return values of all the arrays.
+ */

@@ -35,3 +35,9 @@ async.waterfall([
     if (err) console.error(err);
     console.log(res);
 });
+
+/**
+ * What does async.waterfall do?
+ *      
+ * ** Waterfall takes as it's parameters several functions, and a callback. Those functions are called one after another with the return value of the previous function used as parameters for the next.
+ */
