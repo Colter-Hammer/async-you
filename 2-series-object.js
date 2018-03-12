@@ -11,9 +11,7 @@ const async = require('async');
 
 async.series({
     requestOne: callback => {
-        let body = {
-            user_id: 1
-        };
+        let body = '';
         http.get(process.argv[2], res => {
             res.on('error', err => callback(err));
             res.on('data', data => body += data);

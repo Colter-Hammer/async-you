@@ -20,13 +20,12 @@ function read(callback) {
 function response(url, callback) {
     let body = '';
     // console.log(url);
+    // console.log(url);
     http.get(url, res => {
         res.on('data', data => body += data.toString());
         res.on('end', () => callback(null, body));
     }).on('error', err => callback(err));
 }
-
-
 
 async.waterfall([
     read,
